@@ -3,13 +3,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using System.Text;
+using System.Text.Json.Serialization;
+using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
 namespace AspNetFunction
 {
     public class Function1(ILogger<Function1> logger)
     {
-        public record InputText(string Value);
-        public record PigLatinText(string Value);
+        public record InputText([property: JsonPropertyName("value")] string Value);
+        public record PigLatinText([property: JsonPropertyName("value")] string Value);
 
         [Function("Function1")]
         public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req, [FromBody] InputText inputText)
