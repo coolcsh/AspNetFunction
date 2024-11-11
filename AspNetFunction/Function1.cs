@@ -1,9 +1,9 @@
+using System.Text;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using System.Text;
-using System.Text.Json.Serialization;
 using FromBodyAttribute = Microsoft.Azure.Functions.Worker.Http.FromBodyAttribute;
 
 namespace AspNetFunction
@@ -11,15 +11,18 @@ namespace AspNetFunction
     public class Function1(ILogger<Function1> logger)
     {
         public record InputText([property: JsonPropertyName("value")] string Value);
+
         public record PigLatinText([property: JsonPropertyName("value")] string Value);
 
         [Function("Function1")]
-        public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req, [FromBody] InputText inputText)
+        public IActionResult Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req,
+            [FromBody] InputText inputText
+        )
         {
             logger.LogInformation("C# HTTP trigger function processed a request.");
             var result = TranslateToPigLatin(inputText.Value);
             return new OkObjectResult(new PigLatinText(result));
-
         }
 
         private static string TranslateToPigLatin(string input)
@@ -48,7 +51,8 @@ namespace AspNetFunction
                     else
                     {
                         pigLatin.Append(
-                            word.Substring(vowelIndex) + word.Substring(0, vowelIndex) + "ay ");
+                            word.Substring(vowelIndex) + word.Substring(0, vowelIndex) + "ay "
+                        );
                     }
                 }
             }
@@ -69,6 +73,5 @@ namespace AspNetFunction
         }
 
         private static bool IsVowel(char c) => char.ToLower(c) is 'a' or 'e' or 'i' or 'o' or 'u';
-
     }
 }
